@@ -1,76 +1,77 @@
 <?= $this->extend('layout') ?>
 <?= $this->section('content') ?>
-Owner
-<link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-
-<section class="section profile">
-  <div class="row">
-    <!-- ❶ Kartu foto & identitas singkat -->
-    <div class="col-xl-4">
-      <div class="card">
-        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-          <img src="<?= base_url('NiceAdmin/assets/img/profile-image.jpg') ?>"" alt="Profile" class="rounded-circle">
-          <h2>John</h2>
-          <h3>(Nama Samaran)</h3>
-
-          <div class="social-links mt-2">
-            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ❷ Kartu detail & tab -->
-    <div class="col-xl-8">
-      <div class="card">
-        <div class="card-body pt-3">
-          <!-- Tabs -->
-          <ul class="nav nav-tabs nav-tabs-bordered">
-            <li class="nav-item">
-              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
-            </li>
-            <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
-            </li>
-            <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Settings</button>
-            </li>
-            <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
-            </li>
-          </ul>
-
-          <div class="tab-content pt-2">
-            <!-- Overview -->
-            <div class="tab-pane fade show active profile-overview" id="profile-overview">
-              <!-- … isi Overview sama seperti di template lengkap … -->
-            </div>
-
-            <!-- Edit Profile -->
-            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-              <!-- … form edit profil … -->
-            </div>
-
-            <!-- Settings -->
-            <div class="tab-pane fade pt-3" id="profile-settings">
-              <!-- … form pengaturan … -->
-            </div>
-
-            <!-- Change Password -->
-            <div class="tab-pane fade pt-3" id="profile-change-password">
-              <!-- … form ganti password … -->
-            </div>
-          </div><!-- End tab-content -->
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
+History Transaksi Pembelian <strong><?= $username ?></strong>
+<hr>
+<div class="table-responsive">
+    <!-- Table with stripped rows -->
+    <table class="table datatable">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">ID Pembelian</th>
+                <th scope="col">Waktu Pembelian</th>
+                <th scope="col">Total Bayar</th>
+                <th scope="col">Alamat</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if (!empty($buy)) :
+                foreach ($buy as $index => $item) :
+            ?>
+                    <tr>
+                        <th scope="row"><?php echo $index + 1 ?></th>
+                        <td><?php echo $item['id'] ?></td>
+                        <td><?php echo $item['created_at'] ?></td>
+                        <td><?php echo number_to_currency($item['total_harga'], 'IDR') ?></td>
+                        <td><?php echo $item['alamat'] ?></td>
+                        <td><?php echo ($item['status'] == "1") ? "Sudah Selesai" : "Belum Selesai" ?></td>
+                        <td>
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#detailModal-<?= $item['id'] ?>">
+                                Detail
+                            </button>
+                        </td>
+                    </tr>
+                    <!-- Detail Modal Begin -->
+                    <div class="modal fade" id="detailModal-<?= $item['id'] ?>" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detail Data</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <?php 
+                                    if(!empty($product)){
+	                                    foreach ($product[$item['id']] as $index2 => $item2) : ?>
+	                                        <?php echo $index2 + 1 . ")" ?>
+	                                        <?php if ($item2['foto'] != '' and file_exists("NiceAdmin/assets/img/" . $item2['foto'] . "")) : ?>
+	                                            <img src="<?php echo base_url() . "img/" . $item2['foto'] ?>" width="100px">
+	                                        <?php endif; ?>
+	                                        <strong><?= $item2['nama'] ?></strong>
+	                                        <?= number_to_currency($item2['harga'], 'IDR') ?>
+	                                        <br>
+	                                        <?= "(" . $item2['jumlah'] . " pcs)" ?><br>
+	                                        <?= number_to_currency($item2['subtotal_harga'], 'IDR') ?>
+	                                        <hr>
+	                                    <?php 
+	                                    endforeach; 
+                                    }
+                                    ?>
+                                    Ongkir <?= number_to_currency($item['ongkir'], 'IDR') ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Detail Modal End -->
+            <?php
+                endforeach;
+            endif;
+            ?>
+        </tbody>
+    </table>
+    <!-- End Table with stripped rows -->
+</div>
 <?= $this->endSection() ?>
